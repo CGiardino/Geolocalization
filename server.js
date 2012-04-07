@@ -62,12 +62,16 @@ var cord=[];
 
 
 
+
 function soc(){
 
             io.sockets.on('connection', function (socket) {
                     cord=[41.87194,12.56738];
                     socket.emit('cord', cord);
-
+                    socket.on('mycor', function (data) {
+                        console.log("ECCO/"+data);
+                        code(data);
+                });
 
 
 
@@ -76,13 +80,13 @@ function soc(){
 
 }
 function soc2(){
-
-    io.sockets.emit('cord', { will: cord[cord.length-2]});
+    console.log(cord);
+    io.sockets.emit('cord', cord);
 
 }
 
 
-function code(x){
+function code(data){
 
     var lat1="";
     var lon1="";
@@ -90,29 +94,18 @@ function code(x){
 
 
 
-            geocoder.geocode(dati[x]+"+Italy",function ( err, data ){
+            geocoder.geocode(data+"+Italy",function ( err, data ){
                 var obj= JSON.parse(JSON.stringify(data));
 
                 if(obj.status=="OVER_QUERY_LIMIT"){
                     console.log(JSON.stringify("OVER_QUERY_LIMIT"));
 
-                    soc();
                 }
                 else if(obj.results[0]!=null){
                     lat1=obj.results[0].geometry.location.lat;
                     lon1=obj.results[0].geometry.location.lng;
-                    cord[ci]=[[lat1],[lon1]];
-
-                    ci++;
-                    var conditions = { cap: dati[x]}
-                        , update = { $set:{lat:lat1,lon:lon1 }}
-                        , options = { multi: true };
-                    geoModel.update(conditions,update,options,callback);
-                    function callback (err, numAffected) {
-                        if(err!=null)
-                            console.log(err);
-                    };
-                        gohead();
+                    cord=[lat1,lon1];
+                    soc2();
                 }
 
 
