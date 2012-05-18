@@ -1,0 +1,123 @@
+!!! 5
+html(lang="en")
+    head
+        meta(name="description", content="Localizzazione del cap o zip code su mappa")
+        meta(name="keywords", content"map, cap, codice avviamento postale, geolocalizzazione, localizzazione")
+        meta(name="viewport",content="initial-scale=1.0, user-scalable=no")
+        style(type="text/css")
+                html { height: 100% }
+                #img1 {heigth: 10px;float:left;margin-left: 30px; margin-top: 10px}
+                #header { height: 25px;margin-top:5px;}
+                #for{ width:30%;float:left;margin-top:18px;}
+                #res{height: 45px;width: 40%px;overflow:scroll;overflow-x:scroll;overflow: -moz-scrollbars-vertical; overflow-y: scroll; float:left; }
+                #b1 {width: 50px;margin-left:10px; font-size: 13px}
+                #lat {padding-right:50px}
+                #footer {height: 30px;margin-left:45%}
+                body { height: 100%; margin: 0; padding: 0;background-image:url('img/stripes.png');}
+
+        script(src='http://code.jquery.com/jquery-1.6.1.min.js')
+        script(type="text/javascript",
+                src="http://maps.googleapis.com/maps/api/js?key=AIzaSyABQ7KzpYoVRa9eM63geCVFoBz74XajLyg&sensor=false")
+        script(type="text/javascript", src="http://geoloc-cgiardino.dotcloud.com/socket.io/socket.io.js")
+
+        script
+            var lat="";
+            var lon="";
+            var indexcord=0;
+            var neighborhoods=[];
+
+            var socket = io.connect('http://geoloc-cgiardino.dotcloud.com/');
+            function initialize(i,cord){
+                            neighborhoods = cord ;
+                            if(i!=0){
+
+                                document.getElementById("res").innerHTML=document.getElementById("res").innerHTML+'<span>'+value +'-'+' Lat/Lon: '+cord[0]+' / '+cord[1]+'<br/>';
+
+
+                                function drop() {
+                                    for (var z = 0; z < neighborhoods.length; z++) {
+                                        setTimeout(function() {
+                                            addMarker();
+                                        }, i * 200);
+                                    }
+                                }
+
+                                function addMarker() {
+                                    markers.push(new google.maps.Marker({
+                                        position: new google.maps.LatLng(neighborhoods[0],neighborhoods[1]),
+                                        map: map,
+                                        draggable: false,
+                                        animation: google.maps.Animation.DROP
+                                    }));
+                                    iterator++;
+                                }
+                                drop();
+
+                            }
+                        }
+            socket.on('fcord', function (cord) {
+
+                            initializeMap(cord);
+                            iterator = 0;
+
+                        });
+            socket.on('cord', function (cord) {
+
+                if(cord[0]=="err"){
+
+                    document.getElementById("t1").style.border="solid red";
+
+                }
+                else{
+                    document.getElementById("t1").style.border="";
+
+                    initialize(indexcord,cord);
+
+                    indexcord++;
+                }
+
+            });
+
+
+            var map;
+            var contentString;
+            var value="";
+            var markers = [];
+            var iterator = 0;
+
+            function initializeMap(cord){
+                var myOptions = {
+                    zoom: 6,
+                    center:  new google.maps.LatLng(cord[0],cord[1]),
+                    mapTypeId: google.maps.MapTypeId.ROADMAP
+                }
+                map =  new google.maps.Map(document.getElementById("map_canvas"), myOptions);
+            }
+
+
+            function invia(){
+                value=document.getElementById("t1").value;
+
+                if(value!="")
+                    socket.emit('mycor', value);
+            }
+
+
+
+  body
+        #header
+            title Cap
+            img(id="img1",src='img/Cap.png')
+            #for
+                #q
+                        input(id="t1", name="q",type="text",onkeydown="if (event.keyCode == 13) document.getElementById('b1').click()")
+
+                        input(id="b1", type="button", value="Invia", onclick="invia();")
+                br
+            #res
+
+
+        #map_canvas(style="width:95%; height:85%;margin-top:50px; margin-bottom:25px;margin-left:auto; margin-right:auto")
+        #footer
+                #f
+                    <a href="http://www.carminegiardino.com"> By Carmine Giardino </a>

@@ -1,0 +1,12 @@
+{
+  "name":"geoloc",
+  "version":"0.1.1",
+  "dependencies": {
+    "express": ">= 2.3.x",
+    "socket.io": ">= 0.0.1",
+    "geocoder": ">= 0.0.1",
+    "jquery": ">= 0.0.1",
+    "jade": ">= 0.0.1"
+  },
+  "author":"cgiardino"
+}
