@@ -1,9 +1,36 @@
 var express = require('express');
 var io = require('socket.io');
+var csv = require('ya-csv');
 var geocoder = require('geocoder');
 var $ =require('jquery');
+var fs = require('fs');
+var mongoose = require('mongoose')
+    , Schema = mongoose.Schema
+    , ObjectId = mongoose.SchemaTypes.ObjectId;
+var geo= new Schema({
+     lat: Number
+    ,lon: Number
+    ,cap: Number
+})
+mongoose.connect('mongodb://localhost/milkplease');
+var geoModel = mongoose.model('geo', geo);
 
 
+/*reader.addListener('data', function(data) {
+    var i=0;
+    while(data[i]!=null ){
+        if(i==1 && data[i]!=""){
+            dati[j]=data[i];
+            j++;
+
+        }
+
+        i++;
+
+    }
+});
+reader.addListener('end',gohead);
+ */
 
 var app = express.createServer(
     express.bodyParser()
@@ -39,12 +66,11 @@ var cord=[];
 function soc(){
 
             io.sockets.on('connection', function (socket) {
-
                     cord=[41.87194,12.56738];
                     socket.emit('cord', cord);
                     socket.on('mycor', function (data) {
-
-                        code(data,socket);
+                        console.log("ECCO/"+data);
+                        code(data);
                 });
 
 
@@ -53,14 +79,14 @@ function soc(){
 
 
 }
-function soc2(sc){
+function soc2(){
     console.log(cord);
-    sc.emit('cord', cord);
+    io.sockets.emit('cord', cord);
 
 }
 
 
-function code(data,sc){
+function code(data){
 
     var lat1="";
     var lon1="";
@@ -79,7 +105,7 @@ function code(data,sc){
                     lat1=obj.results[0].geometry.location.lat;
                     lon1=obj.results[0].geometry.location.lng;
                     cord=[lat1,lon1];
-                    soc2(sc);
+                    soc2();
                 }
 
 
