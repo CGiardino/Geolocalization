@@ -12,7 +12,7 @@ var geo= new Schema({
     ,lon: Number
     ,cap: Number
 })
-mongoose.connect('mongodb://localhost/milkplease');
+mongoose.connect('insert here your url');
 var geoModel = mongoose.model('geo', geo);
 
 
